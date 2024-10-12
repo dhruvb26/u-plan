@@ -6,8 +6,10 @@ from folium.plugins import HeatMap
 from flask import Flask, jsonify, request
 import requests
 import random
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 def get_coordinates(zip_code):
     geolocator = Nominatim(user_agent="uhi_calculator")
@@ -141,44 +143,19 @@ def get_formatted_uhi_values(zip_code):
     if not uhi_values:
         return []
     
+    
     formatted_uhi_values = [
-        f"location:({lat:.4f},{lon:.4f}),temperature:{uhi:.2f}"
+        {"coordinates": [round(lon, 2), round(lat, 2)], "temperature": round(uhi, 2)}
         for lat, lon, uhi in uhi_values
     ]
     
     # Create and save the heatmap
     heatmap = create_heatmap(zip_code, uhi_values)
-    if heatmap:
-        heatmap.save(f"uhi_heatmap_{zip_code}.html")
+    # if heatmap:
+    #     heatmap.save(f"uhi_heatmap_{zip_code}.html")
     
     return formatted_uhi_values
 
-# if __name__ == "__main__":
-#     zip_code = input("Enter a zip code: ")
-#     result = get_formatted_uhi_values(zip_code)
-#     print(result)
-#     uhi_values = calculate_uhi_scattered(zip_code)
-    
-#     if not uhi_values:
-#         print(f"Could not calculate UHI values for {zip_code}")
-#     else:
-#         formatted_uhi_values = [
-#             f"location:({lat:.4f},{lon:.4f}),temperature:{uhi:.2f}"
-#             for lat, lon, uhi in uhi_values
-#         ]
-        
-#         # Print the formatted list
-#         print(f"UHI values for different areas in {zip_code}:")
-#         print(formatted_uhi_values)
-        
-#         avg_uhi = np.mean([uhi for _, _, uhi in uhi_values])
-#         print(f"\nAverage UHI for {zip_code}: {avg_uhi:.2f}°C")
-        
-#         # Create and save the heatmap
-#         heatmap = create_heatmap(zip_code, uhi_values)
-#         if heatmap:
-#             heatmap.save(f"uhi_heatmap_{zip_code}.html")
-#             print(f"Heatmap saved as uhi_heatmap_{zip_code}.html")
 @app.route('/uhi', methods=['GET'])
 def get_uhi():
     zip_code = request.args.get('zip_code')
@@ -193,4 +170,4 @@ def get_uhi():
     return jsonify({"uhi_values": uhi_values})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=3001) 

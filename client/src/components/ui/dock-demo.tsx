@@ -10,12 +10,12 @@ export function MapDock() {
     <Dock direction="bottom">
       <DockIcon>
         <Link href="/">
-          <Home className="size-5 text-white" />
+          <Home className="size-5 text-black" />
         </Link>
       </DockIcon>
       <DockIcon>
         <Link href={"/chat"}>
-          <MessageCircle className="size-5 text-white" />
+          <MessageCircle className="size-5 text-black" />
         </Link>
       </DockIcon>
     </Dock>

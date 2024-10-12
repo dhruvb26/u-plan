@@ -3,13 +3,13 @@ import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { Feature, Point } from "geojson";
 import ReactDOM from "react-dom";
-import { X } from "lucide-react";
+import { Loader2, X, Search } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MapDock } from "@/components/ui/dock-demo";
-import { Search } from "lucide-react";
+
 const Demo = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -23,6 +23,8 @@ const Demo = () => {
     coordinates: [number, number];
     temperature: number;
   } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     mapboxgl.accessToken =
@@ -31,150 +33,14 @@ const Demo = () => {
     if (mapContainerRef.current) {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/dark-v11",
+        style: "mapbox://styles/mapbox/light-v11",
         center: [-111.94, 33.4484], // Tempe coordinates
         zoom: 11,
       });
 
       mapRef.current.on("load", () => {
-        // Generate points based on the image
-        const points: Feature<Point>[] = [
-          { coordinates: [-111.9623, 33.4733], temperature: 0.8 },
-          { coordinates: [-111.9357, 33.4786], temperature: 1 },
-          { coordinates: [-111.9031, 33.48], temperature: 0.6 },
-          { coordinates: [-111.9695, 33.4438], temperature: 0.4 },
-          { coordinates: [-111.9363, 33.4527], temperature: 0.7 },
-          { coordinates: [-111.9706, 33.4229], temperature: 0.9 },
-          { coordinates: [-111.9513, 33.4145], temperature: 1 },
-          { coordinates: [-111.8926, 33.4365], temperature: 0.5 },
-          { coordinates: [-111.9256, 33.4179], temperature: 0.8 },
-          { coordinates: [-111.8991, 33.439], temperature: 0.7 },
-          { coordinates: [-111.952, 33.4057], temperature: 1 },
-          { coordinates: [-111.9196, 33.4073], temperature: 0.9 },
-          { coordinates: [-111.8984, 33.3976], temperature: 0.8 },
-          { coordinates: [-111.8975, 33.416], temperature: 0.6 },
-          { coordinates: [-111.9373, 33.3948], temperature: 1 },
-          { coordinates: [-111.9001, 33.3806], temperature: 0.9 },
-          { coordinates: [-111.9749, 33.3913], temperature: 0.7 },
-          { coordinates: [-111.9423, 33.3726], temperature: 0.8 },
-          { coordinates: [-111.8978, 33.3728], temperature: 1 },
-          { coordinates: [-111.9625, 33.3738], temperature: 0.9 },
-        ].map(({ coordinates, temperature }) => ({
-          type: "Feature",
-          properties: { temperature },
-          geometry: {
-            type: "Point",
-            coordinates,
-          },
-        }));
-
-        mapRef.current?.addSource("heatmap-points", {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: points,
-          },
-        });
-
-        mapRef.current?.addLayer({
-          id: "heatmap-layer",
-          type: "heatmap",
-          source: "heatmap-points",
-          paint: {
-            "heatmap-weight": [
-              "interpolate",
-              ["linear"],
-              ["get", "temperature"],
-              0,
-              0,
-              1,
-              1,
-            ],
-            "heatmap-intensity": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0,
-              1,
-              9,
-              3,
-            ],
-            "heatmap-color": [
-              "interpolate",
-              ["linear"],
-              ["heatmap-density"],
-              0,
-              "rgba(33,102,172,0)",
-              0.2,
-              "rgb(103,169,207)",
-              0.4,
-              "rgb(209,229,240)",
-              0.6,
-              "rgb(253,219,199)",
-              0.8,
-              "rgb(239,138,98)",
-              1,
-              "rgb(178,24,43)",
-            ],
-            "heatmap-radius": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0,
-              2,
-              9,
-              20,
-            ],
-            "heatmap-opacity": 0.8,
-          },
-        });
-
-        // Add source for zipcode boundary
-        mapRef.current?.addSource("zipcode-boundary", {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            geometry: {
-              type: "Polygon",
-              coordinates: [],
-            },
-            properties: {},
-          },
-        });
-
-        // // Add layer for zipcode boundary
-        // mapRef.current?.addLayer({
-        //   id: "zipcode-boundary-layer",
-        //   type: "line",
-        //   source: "zipcode-boundary",
-        //   paint: {
-        //     "line-color": "#000",
-        //     "line-width": 2,
-        //   },
-        // });
-
-        // Add click event listener for pointscdx
-        mapRef.current?.on("click", "heatmap-layer", (e) => {
-          if (e.lngLat && e.features && e.features[0]) {
-            const coordinates = e.lngLat.toArray() as [number, number];
-            const temperature = e.features[0].properties?.temperature || 0;
-            setClickedPopupInfo({ coordinates, temperature: temperature });
-          }
-        });
-
-        // Change the cursor to a pointer when the mouse is over the points layer.
-        mapRef.current?.on("mouseenter", "heatmap-layer", () => {
-          if (mapRef.current) {
-            mapRef.current.getCanvas().style.cursor = "pointer";
-          }
-        });
-
-        // Change it back to a pointer when it leaves.
-        mapRef.current?.on("mouseleave", "heatmap-layer", () => {
-          if (mapRef.current) {
-            mapRef.current.getCanvas().style.cursor = "";
-          }
-        });
+        setMapLoaded(true);
+        setIsLoading(false);
       });
     }
 
@@ -182,56 +48,158 @@ const Demo = () => {
       mapRef.current?.remove();
     };
   }, []);
-
   const handleZipcodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
-      const response = await fetch(
+      // Fetch zipcode coordinates
+      const geocodingResponse = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${zipcode}.json?access_token=${mapboxgl.accessToken}&types=postcode`
       );
-      const data = await response.json();
-      if (data.features && data.features.length > 0) {
-        const [lng, lat] = data.features[0].center;
-        const bbox = data.features[0].bbox;
+      const geocodingData = await geocodingResponse.json();
 
+      if (geocodingData.features && geocodingData.features.length > 0) {
+        const [lng, lat] = geocodingData.features[0].center;
         mapRef.current?.flyTo({
           center: [lng, lat],
           zoom: 12,
         });
 
-        // Update the zipcode boundary
-        if (mapRef.current) {
-          const source = mapRef.current.getSource(
-            "zipcode-boundary"
-          ) as mapboxgl.GeoJSONSource;
-          source.setData({
-            type: "Feature",
-            properties: {},
-            geometry: {
-              type: "Polygon",
-              coordinates: [
-                [
-                  [bbox[0], bbox[1]],
-                  [bbox[2], bbox[1]],
-                  [bbox[2], bbox[3]],
-                  [bbox[0], bbox[3]],
-                  [bbox[0], bbox[1]],
-                ],
-              ],
-            },
-          });
+        // Fetch UHI data for the entered zipcode
+        const uhiResponse = await fetch(
+          `http://localhost:3001/uhi?zip_code=${zipcode}`
+        );
+
+        if (!uhiResponse.ok) {
+          throw new Error(`HTTP error! status: ${uhiResponse.status}`);
         }
 
-        setFocusedZipcode(zipcode);
-      } else {
-        toast.error("Zipcode not found");
+        const uhiData = await uhiResponse.json();
+
+        if (!uhiData.uhi_values || !Array.isArray(uhiData.uhi_values)) {
+          throw new Error("Invalid data format received from API");
+        }
+
+        const points: Feature<Point>[] = uhiData.uhi_values.map(
+          ({ coordinates, temperature }: any) => ({
+            type: "Feature",
+            properties: { temperature },
+            geometry: {
+              type: "Point",
+              coordinates,
+            },
+          })
+        );
+
+        // Add or update the heatmap source and layer
+        if (mapRef.current) {
+          if (mapRef.current.getSource("heatmap-points")) {
+            (
+              mapRef.current.getSource(
+                "heatmap-points"
+              ) as mapboxgl.GeoJSONSource
+            ).setData({
+              type: "FeatureCollection",
+              features: points,
+            });
+          } else {
+            mapRef.current?.addSource("heatmap-points", {
+              type: "geojson",
+              data: {
+                type: "FeatureCollection",
+                features: points,
+              },
+            });
+
+            mapRef.current?.addLayer({
+              id: "heatmap-layer",
+              type: "heatmap",
+              source: "heatmap-points",
+              paint: {
+                "heatmap-weight": [
+                  "interpolate",
+                  ["linear"],
+                  ["get", "temperature"],
+                  0,
+                  0,
+                  1,
+                  1,
+                ],
+                "heatmap-intensity": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  1,
+                  9,
+                  3,
+                ],
+                "heatmap-color": [
+                  "interpolate",
+                  ["linear"],
+                  ["heatmap-density"],
+                  0,
+                  "rgba(33,102,172,0)",
+                  0.2,
+                  "rgb(103,169,207)",
+                  0.4,
+                  "rgb(209,229,240)",
+                  0.6,
+                  "rgb(253,219,199)",
+                  0.8,
+                  "rgb(239,138,98)",
+                  1,
+                  "rgb(178,24,43)",
+                ],
+                "heatmap-radius": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  2,
+                  9,
+                  20,
+                ],
+                "heatmap-opacity": 0.8,
+              },
+            });
+
+            // Add click event listener for points
+            mapRef.current.on("click", "heatmap-layer", (e) => {
+              if (e.lngLat && e.features && e.features[0]) {
+                const coordinates = e.lngLat.toArray() as [number, number];
+                const temperature = e.features[0].properties?.temperature || 0;
+                setClickedPopupInfo({ coordinates, temperature: temperature });
+              }
+            });
+
+            // Change the cursor to a pointer when the mouse is over the points layer.
+            mapRef.current.on("mouseenter", "heatmap-layer", () => {
+              if (mapRef.current) {
+                mapRef.current.getCanvas().style.cursor = "pointer";
+              }
+            });
+
+            mapRef.current.on("mouseleave", "heatmap-layer", () => {
+              if (mapRef.current) {
+                mapRef.current.getCanvas().style.cursor = "";
+              }
+            });
+          }
+
+          setFocusedZipcode(zipcode);
+        } else {
+          toast.error("Zipcode not found");
+        }
       }
     } catch (error) {
-      console.error("Error fetching zipcode coordinates:", error);
-      toast.error("Error fetching zipcode coordinates");
+      console.error("Error fetching data:", error);
+      toast.error("Error fetching data");
+    } finally {
+      setIsLoading(false);
     }
   };
-
   return (
     <main className="absolute inset-0">
       <div
@@ -239,11 +207,16 @@ const Demo = () => {
         ref={mapContainerRef}
         className="h-full w-full bg-gray-300"
       ></div>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <Loader2 className="animate-spin text-white" size={48} />
+        </div>
+      )}
       <div className="absolute left-0 top-0 h-full flex items-start px-4">
         <MapDock />
       </div>
 
-      <div className="absolute mt-4 border border-white justify-center top-4 items-center right-4 z-10 bg-white p-4 rounded-lg bg-opacity-0 flex flex-row space-x-2">
+      <div className="absolute mt-4 border  justify-center top-4 items-center right-4 z-10 bg-white p-4 rounded-lg flex flex-row space-x-2">
         <form
           onSubmit={handleZipcodeSubmit}
           className="flex flex-row space-x-2"
