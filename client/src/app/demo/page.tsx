@@ -42,6 +42,12 @@ const ShinyText: React.FC<{ sentences: string[] }> = ({ sentences }) => {
   );
 };
 const Demo = () => {
+  const loadingSentences = [
+    "Thinking",
+    "Analyzing heat zones",
+    "Calculating temperature differences",
+    "Preparing data visualization",
+  ];
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [zipcode, setZipcode] = useState("");
@@ -68,12 +74,9 @@ const Demo = () => {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/light-v11",
-        center: [-111.94, 33.4484], // Tempe coordinates
+        center: [-71.1167, 42.377], // Harvard coordinates
         zoom: 11,
       });
-
-
-
 
       mapRef.current.on("load", () => {
         setMapLoaded(true);
@@ -123,7 +126,7 @@ const Demo = () => {
             type: "Feature",
             properties: {
               temperature,
-              uhiIntensity: getUHIIntensity(temperature)
+              uhiIntensity: getUHIIntensity(temperature),
             },
             geometry: {
               type: "Point",
@@ -210,7 +213,8 @@ const Demo = () => {
               if (e.lngLat && e.features && e.features[0]) {
                 const coordinates = e.lngLat.toArray() as [number, number];
                 const temperature = e.features[0].properties?.temperature || 0;
-                const uhiIntensity = e.features[0].properties?.uhiIntensity || "";
+                const uhiIntensity =
+                  e.features[0].properties?.uhiIntensity || "";
                 setClickedPopupInfo({ coordinates, temperature, uhiIntensity });
               }
             });
@@ -247,7 +251,6 @@ const Demo = () => {
     return "High";
   };
 
-
   return (
     <main className="absolute inset-0">
       <div
@@ -256,8 +259,8 @@ const Demo = () => {
         className="h-full w-full bg-gray-300"
       ></div>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <Loader2 className="animate-spin text-white" size={48} />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-50">
+          <ShinyText sentences={loadingSentences} />
         </div>
       )}
       <div className="absolute left-0 top-0 h-full flex items-start px-4">
@@ -299,10 +302,10 @@ const Demo = () => {
           latitude={clickedPopupInfo.coordinates[1]}
           onClose={() => setClickedPopupInfo(null)}
           temperature={clickedPopupInfo.temperature}
-
           uhiIntensity={clickedPopupInfo.uhiIntensity}
         />
       )}
+      <ChatPopup />
     </main>
   );
 };
@@ -369,10 +372,16 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
               </h4>
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs">
-                    UHI Intensity:
-                  </span>
-                  <span className={`text-xs font-semibold ${uhiIntensity === 'Low' ? 'text-green-500' : uhiIntensity === 'Moderate' ? 'text-yellow-500' : 'text-red-500'}`}>
+                  <span className="text-xs">UHI Intensity:</span>
+                  <span
+                    className={`text-xs font-semibold ${
+                      uhiIntensity === "Low"
+                        ? "text-green-500"
+                        : uhiIntensity === "Moderate"
+                        ? "text-yellow-500"
+                        : "text-red-500"
+                    }`}
+                  >
                     {uhiIntensity}
                   </span>
                 </div>
