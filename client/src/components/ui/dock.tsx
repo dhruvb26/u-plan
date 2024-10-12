@@ -14,11 +14,11 @@ export interface DockProps extends VariantProps<typeof dockVariants> {
   children: React.ReactNode;
 }
 
-const DEFAULT_MAGNIFICATION = 60;
+const DEFAULT_MAGNIFICATION = 45;
 const DEFAULT_DISTANCE = 120;
 
 const dockVariants = cva(
-  "mx-auto mt-8 flex h-[58px] w-max gap-2 rounded-lg p-2 border border-black "
+  "mx-auto mt-8 flex h-[58px] w-max gap-2 rounded-lg p-2"
 );
 
 const Dock = React.forwardRef<HTMLDivElement, DockProps>(

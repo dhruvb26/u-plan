@@ -9,8 +9,45 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MapDock } from "@/components/ui/dock-demo";
+import ChatPopup from "@/components/ui/chat-popup";
+const ShinyText: React.FC<{ sentences: string[] }> = ({ sentences }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [dotCount, setDotCount] = useState(0);
 
+  useEffect(() => {
+    const sentenceInterval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % sentences.length);
+    }, 4000); // Change sentence every 3 seconds
+
+    const dotInterval = setInterval(() => {
+      setDotCount((prevCount) => (prevCount + 1) % 4);
+    }, 1000); // Change dot count every 0.5 seconds
+
+    return () => {
+      clearInterval(sentenceInterval);
+      clearInterval(dotInterval);
+    };
+  }, [sentences]);
+
+  return (
+    <div className="shiny-text-container bg-white rounded-lg px-4 py-2 text-sm">
+      <p
+        key={currentIndex}
+        className="bg-shine-gradient text-base bg-shine-size animate-shine bg-clip-text text-transparent"
+      >
+        {sentences[currentIndex]}
+        {/* <span className="dots-animation">{".".repeat(dotCount)}</span> */}
+      </p>
+    </div>
+  );
+};
 const Demo = () => {
+  const loadingSentences = [
+    "Thinking",
+    "Analyzing heat zones",
+    "Calculating temperature differences",
+    "Preparing data visualization",
+  ];
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [zipcode, setZipcode] = useState("");
@@ -34,8 +71,9 @@ const Demo = () => {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/light-v11",
-        center: [-111.94, 33.4484], // Tempe coordinates
+        center: [-71.1167, 42.377], // Harvard SOCH Building coordinates
         zoom: 11,
+        attributionControl: false, // Add this line to remove the attribution control
       });
 
       mapRef.current.on("load", () => {
@@ -200,6 +238,7 @@ const Demo = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <main className="absolute inset-0">
       <div
@@ -208,8 +247,9 @@ const Demo = () => {
         className="h-full w-full bg-gray-300"
       ></div>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <Loader2 className="animate-spin text-white" size={48} />
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg z-50 bg-white bg-opacity-30">
+          {/* <Loader2 className="animate-spin text-white" size={48} /> */}
+          <ShinyText sentences={loadingSentences} />
         </div>
       )}
       <div className="absolute left-0 top-0 h-full flex items-start px-4">
@@ -250,6 +290,9 @@ const Demo = () => {
           onClose={() => setClickedPopupInfo(null)}
         />
       )}
+      <div className="absolute bottom-4 right-4 z-20  px-2">
+        <ChatPopup />
+      </div>
     </main>
   );
 };

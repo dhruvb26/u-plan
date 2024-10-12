@@ -8,14 +8,9 @@ export type IconProps = React.HTMLAttributes<SVGElement>;
 export function MapDock() {
   return (
     <Dock direction="bottom">
-      <DockIcon>
+      <DockIcon className="bg-primary">
         <Link href="/">
-          <Home className="size-5 text-black" />
-        </Link>
-      </DockIcon>
-      <DockIcon>
-        <Link href={"/chat"}>
-          <MessageCircle className="size-5 text-black" />
+          <Home className="size-5 text-white" />
         </Link>
       </DockIcon>
     </Dock>
