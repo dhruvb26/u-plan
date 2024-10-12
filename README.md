@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# u-plan
 
-## Getting Started
+u-plan is a web platform designed for construction planners, governments, and urban developers to gather crucial environmental insights by simply entering a zipcode. The platform helps users make data-driven decisions for sustainable urban development, focusing on reducing the Urban Heat Island (UHI) effect, increasing vegetation cover, and selecting materials with better albedo for energy efficiency.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **UHI Index**: Provides the temperature difference between urban and rural areas.
+- **Vegetation Cover**: Displays the percentage of vegetation in the area, helping in the planning of green spaces.
+- **Albedo**: Shows the reflectivity of surfaces, enabling the selection of materials to reduce heat absorption.
+- **Climate Risks**: Highlights potential climate risks such as heatwaves or flood risks in the area.
+- **Built Environment Data**: Displays the number of homes at risk and other crucial infrastructure information.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How It Works
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Enter a Zipcode**: Get instant data on Urban Heat Island index, vegetation cover, albedo, and climate risks for the selected area.
+2. **Analyze the Data**: Use the provided insights to plan urban projects, such as building energy-efficient structures or increasing green spaces.
+3. **Actionable Insights**: Get customized recommendations for sustainable planning, improving public health, and reducing the environmental impact.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Installation
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+Make sure you have the following installed:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Node.js** (version 16 or higher)
+- **Python** (version 3.11 or higher)
+- **Google Earth Engine API** (for environmental data)
+- **Mapbox API** (for interactive maps)
+- **Conda** (for managing Python environments)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Setup Instructions
 
-## Deploy on Vercel
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/yourusername/u-plan.git
+   ```
+2. **Navigate to the Project Directory**:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   cd u-plan
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Install Dependencies**:
+
+   - For the **frontend**:
+     ```bash
+     npm install
+     ```
+   - For the **backend**:
+     Make sure you're in the root folder and install backend dependencies via pip or Conda:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+4. **Set Up Environment Variables**:
+
+   - Create a `.env` file in the root directory and add the following environment variables:
+     ```bash
+     MAPBOX_API_KEY=your-mapbox-api-key
+     GOOGLE_EARTH_ENGINE_CREDENTIALS=your-gee-credentials
+     ```
+
+5. **Run the Application**:
+
+   - Start the frontend server:
+     ```bash
+     npm run dev
+     ```
+   - Start the backend server:
+     ```bash
+     python app.py
+     ```
+
+6. **Access the Application**:
+   Visit `http://localhost:3000` in your browser to start using u-plan.
+
+## Technologies Used
+
+- **Next.js**: Frontend framework for server-side rendering.
+- **Python**: Backend logic and data processing.
+- **Google Earth Engine API**: For gathering environmental data such as UHI, vegetation cover, and albedo.
+- **Mapbox**: For interactive mapping and visualizing zipcode data.
+- **Conda**: For managing Python environments.
+- **SQLite**: For local database management.
+
+## Contribution Guidelines
+
+We welcome contributions to improve u-plan! Here’s how you can help:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add new feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Open a Pull Request.
+
+For major changes, please open an issue to discuss your proposed changes beforehand.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## Contact
+
+For any questions or feedback, please reach out to:
+
+- **Shreyas Bansal**: shreyas@example.com
+- **Project Repository**: [https://github.com/yourusername/u-plan](https://github.com/yourusername/u-plan)
+
+---
+
+This README provides a comprehensive overview of the u-plan project, setup instructions, and contribution guidelines, which are essential for any open-source or collaborative project on GitHub.
