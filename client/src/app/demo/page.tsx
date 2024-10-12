@@ -18,10 +18,13 @@ const Demo = () => {
     coordinates: [number, number];
     temperature: number;
   } | null>(null);
+  const [uhiIntensity, setUhiIntensity] = useState<string>("");
+
   const [focusedZipcode, setFocusedZipcode] = useState<string | null>(null);
   const [clickedPopupInfo, setClickedPopupInfo] = useState<{
     coordinates: [number, number];
     temperature: number;
+    uhiIntensity: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -37,6 +40,9 @@ const Demo = () => {
         center: [-111.94, 33.4484], // Tempe coordinates
         zoom: 11,
       });
+
+
+
 
       mapRef.current.on("load", () => {
         setMapLoaded(true);
@@ -84,7 +90,10 @@ const Demo = () => {
         const points: Feature<Point>[] = uhiData.uhi_values.map(
           ({ coordinates, temperature }: any) => ({
             type: "Feature",
-            properties: { temperature },
+            properties: {
+              temperature,
+              uhiIntensity: getUHIIntensity(temperature)
+            },
             geometry: {
               type: "Point",
               coordinates,
@@ -165,12 +174,13 @@ const Demo = () => {
               },
             });
 
-            // Add click event listener for points
+            // Update click event listener for points
             mapRef.current.on("click", "heatmap-layer", (e) => {
               if (e.lngLat && e.features && e.features[0]) {
                 const coordinates = e.lngLat.toArray() as [number, number];
                 const temperature = e.features[0].properties?.temperature || 0;
-                setClickedPopupInfo({ coordinates, temperature: temperature });
+                const uhiIntensity = e.features[0].properties?.uhiIntensity || "";
+                setClickedPopupInfo({ coordinates, temperature, uhiIntensity });
               }
             });
 
@@ -200,6 +210,13 @@ const Demo = () => {
       setIsLoading(false);
     }
   };
+  const getUHIIntensity = (temp: number) => {
+    if (temp < 0.5) return "Low";
+    if (temp < 2) return "Moderate";
+    return "High";
+  };
+
+
   return (
     <main className="absolute inset-0">
       <div
@@ -239,7 +256,9 @@ const Demo = () => {
           mapRef={mapRef}
           longitude={clickedPopupInfo?.coordinates[0] ?? 0}
           latitude={clickedPopupInfo?.coordinates[1] ?? 0}
+          temperature={clickedPopupInfo?.temperature ?? 0}
           onClose={() => setPopupInfo(null)}
+          uhiIntensity={uhiIntensity}
         />
       )}
       {clickedPopupInfo && (
@@ -248,6 +267,9 @@ const Demo = () => {
           longitude={clickedPopupInfo.coordinates[0]}
           latitude={clickedPopupInfo.coordinates[1]}
           onClose={() => setClickedPopupInfo(null)}
+          temperature={clickedPopupInfo.temperature}
+
+          uhiIntensity={clickedPopupInfo.uhiIntensity}
         />
       )}
     </main>
@@ -258,6 +280,8 @@ interface CustomPopupProps {
   mapRef: React.RefObject<mapboxgl.Map | undefined>;
   longitude: number;
   latitude: number;
+  temperature: number;
+  uhiIntensity: string;
   onClose: () => void;
 }
 
@@ -265,6 +289,8 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
   mapRef,
   longitude,
   latitude,
+  temperature,
+  uhiIntensity,
   onClose,
 }) => {
   const popupRef = useRef<mapboxgl.Popup | null>(null);
@@ -308,21 +334,21 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
           <div className="space-y-4">
             <section>
               <h4 className="text-sm font-semibold text-gray-700 mb-1">
-                People & Vulnerabilities
+                Urban Heat Island (UHI)
               </h4>
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <span className="text-xs">
-                    % Eligible for Public Assistance
+                    UHI Intensity:
                   </span>
-                  <span className="text-xs font-semibold text-red-500">
-                    {neighborhoodData.publicAssistance}
+                  <span className={`text-xs font-semibold ${uhiIntensity === 'Low' ? 'text-green-500' : uhiIntensity === 'Moderate' ? 'text-yellow-500' : 'text-red-500'}`}>
+                    {uhiIntensity}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs">% Below Poverty</span>
+                  <span className="text-xs">Temperature:</span>
                   <span className="text-xs font-semibold text-yellow-500">
-                    {neighborhoodData.belowPoverty}
+                    {temperature}°C
                   </span>
                 </div>
               </div>
@@ -330,7 +356,7 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
 
             <section>
               <h4 className="text-sm font-semibold text-gray-700 mb-1">
-                Climate & Hazards
+                Vegetation
               </h4>
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
@@ -395,7 +421,7 @@ const CustomPopup: React.FC<CustomPopupProps> = ({
       }
       ReactDOM.unmountComponentAtNode(popupElement);
     };
-  }, [mapRef, longitude, latitude, onClose]);
+  }, [mapRef, longitude, latitude, temperature, onClose, uhiIntensity]);
 
   return null;
 };
