@@ -12,7 +12,7 @@ import { MapDock } from "@/components/ui/dock-demo";
 import ChatPopup from "@/components/ui/chat-popup";
 const ShinyText: React.FC<{ sentences: string[] }> = ({ sentences }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [dotCount, setDotCount] = useState(0);
+  // const [dotCount, setDotCount] = useState(0);
 
   useEffect(() => {
     const sentenceInterval = setInterval(() => {
@@ -20,7 +20,7 @@ const ShinyText: React.FC<{ sentences: string[] }> = ({ sentences }) => {
     }, 4000); // Change sentence every 3 seconds
 
     const dotInterval = setInterval(() => {
-      setDotCount((prevCount) => (prevCount + 1) % 4);
+      // setDotCount((prevCount) => (prevCount + 1) % 4);
     }, 1000); // Change dot count every 0.5 seconds
 
     return () => {
